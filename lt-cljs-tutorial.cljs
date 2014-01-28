@@ -699,22 +699,22 @@ some-x
 ;; variable scoped language.
 
 (let [a 1e3]
-  (defn foo []
+  (defn foo4 []
     (* a a))
-  (defn bar []
-    (+ (foo) a)))
+  (defn bar4 []
+    (+ (foo4) a)))
 
-;; Above we defined `foo` and `bar` functions inside the scope of a
-;; `let` form and they both know about `a` (i.e. they close over `a`)
-;; Note, even if defined inside a `let`, `foo` and `bar` are available
-;; in the outer scope. This is because all `def` expressions are always
+;; Even if defined inside a `let`, `foo4` and `bar4` are available in
+;; the outer scope. This is because all `def` expressions are always
 ;; top level. See the footnote at the end of this sections.
 
+;; Above we defined `foo4` and `bar4` functions inside the scope of a
+;; `let` form and they both know about `a` (i.e. they close over `a`)
 
-(foo)
-(bar)
+(foo4)
+(bar4)
 
-;; And Nobody else.
+;; and nobody else.
 
 (comment
   (defn baz []
@@ -725,8 +725,60 @@ some-x
 ;; That's why some people say closures are the poor's man objects.
 ;; They encapsulate the information as well.
 
-;; But in ClojureScript functions parameters and let bindings locals
-;; are not mutable! And loop locals too!
+;; But what if you would like to change the binding of a closed over
+;; symbol?
+
+(def i-am-not-dynamic 1)
+
+(defn foo5 []                           ;I close over `i-am...`
+  (* i-am-not-dynamic i-am-not-dynamic))
+
+(defn bar5 [n]                          ;I'm a regular fn
+  (* n n))
+
+(foo5)
+(bar5 i-am-not-dynamic)
+
+;; But if you try to rebound it
+
+(let [i-am-not-dynamic 1e3]
+  (foo5))
+
+;; you fail with a closure, but you succeed with a regular function
+ 
+(let [i-am-not-dynamic 1e3]
+  (bar5 i-am-not-dynamic))
+
+;; That said, by meta tagging a symbol as `:dynamic` you can temporary
+;; change its bounded value as if you were coding with a dynamic
+;; scoped language.
+
+;; See paragraph below on Metadata for an exaplanation of Metatadata
+;; and the `^` shortcut.
+
+(def ^:dynamic *i-am-dynamic* 1)
+
+;; It's idiomatic to wrap *dynamic-symbols* inside a pair of `*`,
+;; called earmuffs.
+
+(defn foo6 []                           ;I close over `*i-am...*`
+  (* *i-am-dynamic* *i-am-dynamic*))
+
+(foo6)
+
+;; By using the `binding` form instead of the `let` form, while you're
+;; in its scope you can now rebind the dynamic symbol.
+
+(let [*i-am-dynamic* 1e3]
+  (foo6))
+
+(binding [*i-am-dynamic* 1e3]
+  (foo6))
+
+*i-am-dynamic*
+
+;; As you have seen, in ClojureScript functions parameters and let
+;; bindings locals are not mutable! And loop locals too!
 
 (let [fns (loop [i 0 ret []]
             (if (< i 10)
