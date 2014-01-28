@@ -745,7 +745,7 @@ some-x
   (foo5))
 
 ;; you fail with a closure, but you succeed with a regular function
- 
+
 (let [i-am-not-dynamic 1e3]
   (bar5 i-am-not-dynamic))
 
@@ -753,8 +753,8 @@ some-x
 ;; change its bounded value as if you were coding with a dynamic
 ;; scoped language.
 
-;; See paragraph below on Metadata for an exaplanation of Metatadata
-;; and the `^` shortcut.
+;; See paragraph below on Metadata for an exaplanation on this topic
+;; and on the `^` shortcut.
 
 (def ^:dynamic *i-am-dynamic* 1)
 
