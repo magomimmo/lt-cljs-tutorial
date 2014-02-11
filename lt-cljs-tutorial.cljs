@@ -373,7 +373,7 @@ a-map
 
 (identity :foo)
 
-;; If you add an additional preceding colon you'll get namespaced keyword.
+;; If you add an additional preceding colon you'll get a namespaced keyword.
 
 (identity ::foo)
 
@@ -1127,10 +1127,6 @@ x
   MyProtocol
   (awesome [this] (vector this "Totally awesome!")))
 
-;; As said while learning about `let` special form, when we're not
-;; interested in the value of an argument it's idiomatic to use the
-;; underscore as a placeholder like above.
-
 (awesome "Is this awesome?")
 
 
@@ -1140,6 +1136,10 @@ x
 ;; Sometimes you want to extend several types to a protocol at once. You can
 ;; use extend-protocol for this. extend-protocol simply desugars into multiple
 ;; extend-type forms.
+
+;; As said while learning about `let` special form, when we're not
+;; interested in the value of an argument it's idiomatic to use the
+;; underscore as a placeholder like above.
 
 (extend-protocol MyProtocol
   js/Date
@@ -1359,7 +1359,7 @@ x
 (assoc-in (contact "Bob" "Smith" "bob.smith@acme.com")
           [:person :first] "Robert")
 
-;; It you need to use the previous value of a nested field for calculating the
+;; If you need to use the previous value of a nested field for calculating the
 ;; new one, you can use 'update-in', like with maps.
 
 (update-in (contact "Bob" "Smith" "bob.smith@acme.com")
@@ -1415,7 +1415,7 @@ x
 
 (make-array 32)
 
-;; You can access an element of a array with `aget`.
+;; You can access an element of an array with `aget`.
 
 (aget #js ["one" "two" "three"] 1)
 
