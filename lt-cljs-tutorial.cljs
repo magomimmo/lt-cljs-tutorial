@@ -474,11 +474,11 @@ a-list
 ;; ClojureScript has a much simpler notion of equality than what is present
 ;; in JavaScript. In ClojureScript equality is always deep equality.
 
-(= {:foo "bar" :baz "woz"} {:foo "bar" :baz "woz"})
+(= {:one 1 :two "2"} {:one 1 :two "2"})
 
 ;; Maps are not ordered.
 
-(= {:foo "bar" :baz "woz"} {:baz "woz" :foo "bar"})
+(= {:one 1 :two "2"} {:two "2" :one 1})
 
 ;; For sequential collections, equality just works.
 
@@ -662,12 +662,15 @@ a-list
 (simple-multi "foo")
 
 ;; However we haven't defined a case for "bar"
-
-(simple-multi "bar")
+; (Highlight and evaluate the `simple-multi` form below)
+(comment
+  (simple-multi "bar")
+  )
 
 
 ;; Here is a function that takes a list. It dispatches on the first element
 ;; of the list!
+;; Note that this example uses destructuring, which is covered later.
 
 (defmulti parse (fn [[f & r :as form]] f))
 
@@ -812,6 +815,22 @@ some-x
 (let [{:keys [first last]} {:first "Bob" :last "Smith"}]
   [first last])
 
+; We can also destructure a nested map
+
+(let [{:keys [first last] {:keys [addr1 addr2]} :address} {:first "Bob" :last "Smith" :address {:addr1 "123" :addr2 "Main street"}}]
+  [first last addr1 addr2])
+
+; Similar to :keys for keyword, :strs and :syms directives are available for matching string and symbol :keys
+
+(let [{:strs [first last]} {"first" "Bob" "last" "Smith"}]
+  [first last])
+
+(let [first 1
+      last 2
+      {:syms [first last]} {'first "Bob" 'last "Smith"}]
+  [first last])
+
+
 ;; The above map destructuring form is very useful when you need to
 ;; define a function with optional, non positional and defaulted
 ;; arguments.
@@ -945,8 +964,11 @@ some-x
 (js/Error. "Oops")
 
 ;; You can throw an error like this.
+;; (Highlight and evaluate the `throw` form below)
 
-(throw (js/Error. "Oops"))
+(comment
+  (throw (js/Error. "Oops"))
+  )
 
 ;; You can catch an error like this.
 
@@ -962,6 +984,17 @@ some-x
   (throw (js/Error. "Oops"))
   (catch :default e
     e))
+
+;; Catches are optional. You can also use multiple forms to handle different types of errors.
+
+(try
+  (throw (js/Error. "Oops"))
+  (catch js/Error e
+    e)
+  (catch Error e
+    e)
+  (finally
+     "Cleanup here"))
 
 
 ;; Mutation
@@ -1102,7 +1135,7 @@ x
 (get {:foo "bar"} :foo)
 (get [:cat :bird :dog] 1)
 
-;; Map destructing actually desugars into `get` calls. That means if you extend
+;; Map destructuring actually desugars into `get` calls. That means if you extend
 ;; your type to ILookup it will also support map destructuring!
 
 
@@ -1154,8 +1187,8 @@ x
 ;; reify
 ;; ----------------------------------------------------------------------------
 
-;; Sometimes it's useful to make an anonymous type which implements some
-;; various protocols.
+;; Sometimes it's useful to make an anonymous type which implements various
+;; protocols.
 
 ;; For example say we want a JavaScript object to support ILookup. Now we don't
 ;; want to blindly `extend-type object`, that would pollute the behavior of plain
